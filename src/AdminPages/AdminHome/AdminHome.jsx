@@ -40,7 +40,7 @@ const AdminHome = () => {
 
   return (
     <div>
-      <div className="flex flex-row justify-start mb-2">
+      <div className="flex flex-row justify-start mb-2 min-w-[1000px]">
         <Link
           to="/admin/additem"
           className="flex items-center bg-green-600 px-4 py-2 text-white rounded-md ml-auto"
