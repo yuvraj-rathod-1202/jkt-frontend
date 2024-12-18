@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useDeleteItemMutation } from '../../redux/features/items/itemsApi.js';
 import { Link } from 'react-router-dom'
 import axios from "axios";
 import getBaseUrl from "../../utils/baseURL.js";
@@ -25,11 +24,10 @@ const EditItemCard = () => {
     }, []); // Empty dependency array ensures this runs only once after component mounts
     
 
-    const [deleteItem] = useDeleteItemMutation();
 
     const handleDeleteitem = async (id) => {
         try {
-            await deleteItem(id).unwrap();
+            await axios.delete(`${getBaseUrl()}/api/items/delete/${id}`);
             Swal.fire({
                     title: "Item deleted",
                     text: "Your Item is deleted successfully!",

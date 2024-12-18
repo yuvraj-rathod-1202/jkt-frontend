@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useDeleteItemMutation } from '../../redux/features/items/itemsApi.js';
 import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
 import getBaseUrl from "../../utils/baseURL.js";
@@ -25,7 +24,6 @@ const EditItems = () => {
         window.scrollTo(0, 0);
     }, []); // Empty dependency array ensures this runs only once after component mounts
 
-    const [deleteItem] = useDeleteItemMutation();
 
     const handleDeleteitem = async (id) => {
         try {
@@ -39,7 +37,7 @@ const EditItems = () => {
                 confirmButtonText: "Yes, delete it!"
               }).then(async (result) =>  {
                 if (result.isConfirmed) {
-                    await deleteItem(id).unwrap();
+                    await axios.delete(`${getBaseUrl()}/api/items/delete/${id}`);
                     Swal.fire({
                         title: "Deleted!",
                         text: "Your item has been deleted.",

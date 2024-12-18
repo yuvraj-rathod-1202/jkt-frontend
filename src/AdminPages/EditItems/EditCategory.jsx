@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDeleteCategoryMutation } from "../../redux/features/categories/categoriesApi";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
@@ -27,7 +26,6 @@ const EditCategory = () => {
     window.scrollTo(0, 0);
 }, []); // Empty dependency array ensures this runs only once after component mounts
     
-        const [deletecategories] = useDeleteCategoryMutation();
     
     
         const handleDeletecategory = async (id) => {
@@ -42,7 +40,7 @@ const EditCategory = () => {
                         confirmButtonText: "Yes, delete it!"
                       }).then(async (result) =>  {
                         if (result.isConfirmed) {
-                            await deletecategories(id).unwrap();
+                            await axios.delete(`${getBaseUrl()}/api/categories/delete/${id}`);
                             Swal.fire({
                                 title: "Deleted!",
                                 text: "Your category has been deleted.",

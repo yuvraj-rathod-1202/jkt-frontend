@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
-import { useDeleteStockMutation } from "../../redux/features/Stocks/stocksApi.js";
 import { FaRupeeSign } from "react-icons/fa";
 import getBaseUrl from "../../utils/baseURL.js";
 import axios from "axios";
@@ -24,8 +23,7 @@ const StockList = () => {
 
         getResponse(); // Call the async function inside useEffect
         window.scrollTo(0, 0);
-    }, []); // Empty dependency array ensures this runs only once after component mounts
-    const [deleteStock] = useDeleteStockMutation();
+    }, []); // Empty dependency array ensures this runs only once after component mounts;
 
     const handleDeletestock = async (id) => {
         try {
@@ -39,7 +37,7 @@ const StockList = () => {
                 confirmButtonText: "Yes, delete it!"
               }).then(async (result) =>  {
                 if (result.isConfirmed) {
-                    await deleteStock(id).unwrap();
+                    await axios.delete(`${getBaseUrl()}/api/stocks/delete/${id}`);
                     Swal.fire({
                         title: "Deleted!",
                         text: "Your item has been deleted.",

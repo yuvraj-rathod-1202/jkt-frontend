@@ -3,7 +3,8 @@ import InputField from "./InputField";
 import SelectField from "./SelectField";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import { useAddItemMutation } from "../../redux/features/items/itemsApi";
+import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 
 const AddItem = () => {
@@ -15,7 +16,6 @@ const AddItem = () => {
   } = useForm();
   const [imageFile, setimageFile] = useState(null);
   const [imageFileName, setimageFileName] = useState("");
-  const [addItem, { isLoading, error }] = useAddItemMutation();
 
   const [categories, setcategories] = useState([]);
 
@@ -61,7 +61,7 @@ useEffect(() => {
     };
 
     try {
-      await addItem(newItemData).unwrap();
+      await axios.post(`${getBaseUrl()}/api/items/create-item`, newItemData);
       Swal.fire({
         title: "Item added",
         text: "Your Item is uploaded successfully!",

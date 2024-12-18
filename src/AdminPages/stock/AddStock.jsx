@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import {
-  useAddCustomerMutation,
-} from "../../redux/features/customers/customerApi";
-import { useAddStockMutation } from "../../redux/features/Stocks/stocksApi";
 import Swal from "sweetalert2";
 import axios from "axios";
 import getBaseUrl from "../../utils/baseURL";
@@ -20,8 +16,6 @@ const AddStock = () => {
 
   const [selectedItemPrice, setSelectedItemPrice] = useState(0); // To store the selected item's price
   const [totalPrice, setTotalPrice] = useState(0); // To calculate and store the total price
-  const [addCustomer] = useAddCustomerMutation();
-  const [addStock] = useAddStockMutation();
   const [mobileNo, setmobileNo] = useState(0);
 
   const [items, setitems] = useState([]);
@@ -89,7 +83,7 @@ const AddStock = () => {
       console.log(customer)
 
       // Add the stock
-      const stockResponse = await addStock(newStockData).unwrap();
+      const stockResponse = await axios.post(`${getBaseUrl()}/api/stocks/create-Stock`, newStockData).unwrap();
       const addedStock = stockResponse.stock;
 
       if (customer === "") {

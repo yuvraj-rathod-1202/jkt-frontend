@@ -3,8 +3,8 @@ import InputField from "./InputField";
 import SelectField from "./SelectField";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import { useAddBrandMutation } from '../../redux/features/brands/brandApi';
-import { useAddCategoryMutation } from '../../redux/features/categories/categoriesApi';
+import axios from 'axios'
+import getBaseUrl from "../../utils/baseURL";
 
 const Addbrandcategory = () => {
   const {
@@ -15,8 +15,6 @@ const Addbrandcategory = () => {
   } = useForm();
   const [imageFile, setimageFile] = useState(null);
   const [imageFileName, setimageFileName] = useState("");
-  const [addBrand, {isLoadingb, errorb}] = useAddBrandMutation();
-  const [addCategory, {isLoadingc, errorc}] = useAddCategoryMutation();
   const onSubmit = async (data) => {
     const newItemData = {
       ...data,
@@ -24,13 +22,13 @@ const Addbrandcategory = () => {
     };
     try {
       if(newItemData.brandcategory == "brand"){
-        await addBrand({
+        await axios.post(`${getBaseUrl()}/api/brands/create-Brand`, {
           name: newItemData.name,
           onHome: newItemData.onHome,
           image: newItemData.image
-        })
+      });
       }else{
-        await addCategory({
+        await axios.post(`${getBaseUrl()}/api/categories/create-Category`, {
           name: newItemData.name,
           onHome: newItemData.onHome,
           image: newItemData.image

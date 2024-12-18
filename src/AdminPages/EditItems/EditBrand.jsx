@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDeleteBrandMutation } from "../../redux/features/brands/brandApi";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
@@ -27,7 +26,6 @@ const EditBrand = () => {
         window.scrollTo(0, 0);
     }, []); // Empty dependency array ensures this runs only once after component mounts
 
-    const [deleteBrands] = useDeleteBrandMutation();
 
 
     const handleDeletebrand = async (id) => {
@@ -42,7 +40,7 @@ const EditBrand = () => {
                     confirmButtonText: "Yes, delete it!"
                   }).then(async (result) =>  {
                     if (result.isConfirmed) {
-                        await deleteBrands(id).unwrap();
+                        await axios.delete(`${getBaseUrl()}/api/brands/delete/${id}`);
                         Swal.fire({
                             title: "Deleted!",
                             text: "Your brand has been deleted.",
