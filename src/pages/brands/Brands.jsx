@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bird from '../../assets/items/gameBird.png'
-import { useFetchAllBrandsQuery } from "../../redux/features/brands/brandApi";
-import Loading from "../../components/Loading";
 import getBaseUrl from "../../utils/baseURL";
 import axios from "axios";
 
@@ -18,10 +16,9 @@ const Brands = () => {
     brands = response.Brands;
     }
     const navigate = useNavigate();
-
+    getresponse();
     console.log(brands);
-    if(isLoading) return <Loading />
-    if(isError) return <div>Error in fetching</div>
+    
 
     const handleBack = () => {
         navigate(-1); // Navigate back to the previous page
