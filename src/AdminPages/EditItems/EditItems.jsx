@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import Swal from "sweetalert2";
 import getBaseUrl from "../../utils/baseURL.js";
 import axios from "axios";
@@ -44,7 +44,7 @@ const EditItems = () => {
                         text: "Your item has been deleted.",
                         icon: "success"
                     });
-                  window.location.reload();
+                  useNavigate(0);
                 }
               });
            
