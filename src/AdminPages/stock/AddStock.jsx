@@ -138,9 +138,7 @@ const AddStock = () => {
     }
   };
 
-  if (isLoadingi) {
-    return <p>Loading...</p>; // Show a loading state while fetching data
-  }
+  
 
   if (isErrori) {
     return <p>Error loading items. Please try again later.</p>; // Handle errors gracefully
