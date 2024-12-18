@@ -110,6 +110,7 @@ const Addbrandcategory = () => {
             accept="image/*"
             onChange={handleFileChange}
             className="mb-2 w-full"
+            name="image"
           />
           {imageFileName && (
             <p className="text-sm text-gray-500">Selected: {imageFileName}</p>
