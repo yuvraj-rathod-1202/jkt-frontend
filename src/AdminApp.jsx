@@ -8,7 +8,7 @@ function AdminApp() {
 
   return (
     <>
-    <div className="flex">
+    <div className="flex min-w-[1000px]">
       <AdminNavbar />
       <main className="flex-grow p-4">
         <Outlet />                
