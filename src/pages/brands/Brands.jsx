@@ -13,6 +13,7 @@ const Brands = () => {
     let brands;
     const getresponse = async () => {
     const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+    console.log(response);
     brands = response.Brands;
     }
     const navigate = useNavigate();
