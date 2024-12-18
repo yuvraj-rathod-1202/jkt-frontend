@@ -83,7 +83,7 @@ const AddStock = () => {
       console.log(customer)
 
       // Add the stock
-      const stockResponse = await axios.post(`${getBaseUrl()}/api/stocks/create-Stock`, newStockData).unwrap();
+      const stockResponse = await axios.post(`${getBaseUrl()}/api/stocks/create-Stock`, newStockData);
       const addedStock = stockResponse.stock;
 
       if (customer === "") {
