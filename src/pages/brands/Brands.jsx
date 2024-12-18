@@ -14,7 +14,7 @@ const Brands = () => {
     const getresponse = async () => {
     const response = await axios.get(`${getBaseUrl()}/api/brands/`);
     console.log(response);
-    brands = response.Brands;
+    brands = response.data.Brands;
     }
     const navigate = useNavigate();
     getresponse();
