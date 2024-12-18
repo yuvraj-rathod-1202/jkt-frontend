@@ -46,7 +46,8 @@ const EditCategory = () => {
                                 text: "Your category has been deleted.",
                                 icon: "success"
                             });
-                          useNavigate(0);
+                            const navigate = useNavigate();
+                          navigate(0);
                         }
                       });
                    
