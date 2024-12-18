@@ -140,9 +140,6 @@ const AddStock = () => {
 
   
 
-  if (isErrori) {
-    return <p>Error loading items. Please try again later.</p>; // Handle errors gracefully
-  }
 
   return (
     <div className="max-w-lg mx-auto md:p-6 p-3 bg-neutral-100 rounded-lg shadow-md">
