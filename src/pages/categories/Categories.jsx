@@ -5,20 +5,30 @@ import { useFetchAllCategoriesQuery } from "../../redux/features/categories/cate
 import Loading from "../../components/Loading";
 
 const Categories = () => {
+  const [categories, setcategories] = useState([]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const {
-    data: response = {},
-    isLoading,
-    isError,
-  } = useFetchAllCategoriesQuery();
-  const categories = response.Categorys;
+  useEffect(() => {
+    const getResponse = async () => {
+        try {
+            const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+            console.log(response);
+            console.log(response.data.Categorys);
+            setcategories(response.data.Categorys); // Set brands data to state
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
+
+    getResponse(); // Call the async function inside useEffect
+    window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
+  
   const navigate = useNavigate();
   
-  if(isLoading) return <Loading />
-  if(isError) return <div>Error in fetching</div>
+ 
 
   const handleBack = () => {
     navigate(-1); // Navigate back to the previous page
@@ -41,14 +51,14 @@ const Categories = () => {
               />
             </Link>
             {categories &&
-              categories.map((brand, index) => (
+              categories.map((category, index) => (
                 <Link
-                  key={brand._id}
+                  key={category._id}
                   className="flex justify-center items-center"
                 >
                   <img
                     src={bird}
-                    alt={brand.name}
+                    alt={category.name}
                     className="w-24 h-24 rounded-full object-cover shadow-sm shadow-purple-600 hover:shadow-md hover:shadow-purple-600"
                   />
                 </Link>
