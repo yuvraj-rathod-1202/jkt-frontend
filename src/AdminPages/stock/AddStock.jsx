@@ -3,7 +3,6 @@ import { useFetchAllItemsQuery } from "../../redux/features/items/itemsApi";
 import { useForm } from "react-hook-form";
 import {
   useAddCustomerMutation,
-  useEditCustomerMutation,
   useFetchCustomerByConditionQuery,
 } from "../../redux/features/customers/customerApi";
 import { useAddStockMutation } from "../../redux/features/Stocks/stocksApi";
@@ -24,7 +23,6 @@ const AddStock = () => {
   const [selectedItemPrice, setSelectedItemPrice] = useState(0); // To store the selected item's price
   const [totalPrice, setTotalPrice] = useState(0); // To calculate and store the total price
   const [addCustomer] = useAddCustomerMutation();
-  // const [updateCustomer] = useEditCustomerMutation();
   const [addStock] = useAddStockMutation();
   const [mobileNo, setmobileNo] = useState(0);
 

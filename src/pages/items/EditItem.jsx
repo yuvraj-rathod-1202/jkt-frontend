@@ -3,7 +3,6 @@ import InputField from "../../AdminPages/AddItems/InputField";
 import SelectField from "../../AdminPages/AddItems/SelectField";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import { useEditItemMutation } from "../../redux/features/items/itemsApi";
 import { useFetchAllCategoriesQuery } from "../../redux/features/categories/categoriesApi";
 import { useFetchAllBrandsQuery } from "../../redux/features/brands/brandApi";
 import { useParams } from "react-router-dom";
@@ -19,7 +18,7 @@ const AddItem = () => {
   } = useForm();
   const [imageFile, setimageFile] = useState(null);
   const [imageFileName, setimageFileName] = useState("");
-  const [editItem, { isLoading, error }] = useEditItemMutation();
+  
 
   const { data: categoryO = [], refetchc } = useFetchAllCategoriesQuery();
   const categories = categoryO.Categorys;

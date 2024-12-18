@@ -6,10 +6,6 @@ const baseQuery = fetchBaseQuery({
     credentials: 'include',
     mode: 'no-cors',
     prepareHeaders: (Headers) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            Headers.set('Authorization', `Bearer ${token}`);
-        }
         return Headers;
     }
 })

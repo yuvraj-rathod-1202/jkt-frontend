@@ -6,10 +6,6 @@ const baseQuery = fetchBaseQuery({
     credentials: 'include', // Ensures cookies are sent
     mode: 'no-cors', // Set no-cors mode (not recommended for most cases)
     prepareHeaders: (headers) => {
-        const token = localStorage.getItem('token'); // Replace this with your token retrieval logic
-        if (token) {
-            headers.set('Authorization', `Bearer ${token}`);
-        }
         headers.set('Content-Type', 'application/json'); // Ensure JSON content type
         return headers;
     }
