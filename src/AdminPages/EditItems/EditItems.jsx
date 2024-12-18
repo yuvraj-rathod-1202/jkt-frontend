@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
 import getBaseUrl from "../../utils/baseURL.js";
 import axios from "axios";
+import { FaRupeeSign } from "react-icons/fa";
 
 const EditItems = () => {
 
@@ -107,7 +108,7 @@ const EditItems = () => {
                                     </td>
                                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
     
-                                        ${item.newPrice}
+                                        <FaRupeeSign />{item.newPrice}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 space-x-4">
     
