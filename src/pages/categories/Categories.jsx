@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bird from "../../assets/items/gameBird.png";
 import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 
 const Categories = () => {
