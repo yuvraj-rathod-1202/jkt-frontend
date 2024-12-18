@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
@@ -46,8 +46,7 @@ const EditCategory = () => {
                                 text: "Your category has been deleted.",
                                 icon: "success"
                             });
-                            const navigate = useNavigate();
-                          navigate(0);
+                          window.location.reload();
                         }
                       });
                    
