@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import bird from '../../assets/items/gameBird.png'
 import { useFetchAllBrandsQuery } from "../../redux/features/brands/brandApi";
 import Loading from "../../components/Loading";
+import getBaseUrl from "../../utils/baseURL";
+import axios from "axios";
 
 const Brands = () => {
 
@@ -10,9 +12,11 @@ const Brands = () => {
         window.scrollTo(0, 0);
     }, []);
 
-
-    const { data: response = {}, isLoading, isError } = useFetchAllBrandsQuery();
-    const brands = response.Brands;
+    let brands;
+    const getresponse = async () => {
+    const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+    brands = response.Brands;
+    }
     const navigate = useNavigate();
 
     console.log(brands);
