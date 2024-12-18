@@ -4,6 +4,7 @@
     const baseQuery = fetchBaseQuery({
         baseUrl: `${getBaseUrl()}/api/stocks`,
         credentials: 'include',
+        mode: 'no-cors',
         prepareHeaders: (Headers) => {
             const token = localStorage.getItem('token');
             if (token) {

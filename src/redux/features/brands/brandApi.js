@@ -4,8 +4,8 @@ import getBaseUrl from '../../../utils/baseURL'
 const baseQuery = fetchBaseQuery({
     baseUrl: `${getBaseUrl()}/api/brands`,
     credentials: 'include', // Ensures cookies are sent
+    mode: 'no-cors', // Set no-cors mode (not recommended for most cases)
     prepareHeaders: (headers) => {
-        // Add Authorization token if required
         const token = localStorage.getItem('token'); // Replace this with your token retrieval logic
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
@@ -14,6 +14,7 @@ const baseQuery = fetchBaseQuery({
         return headers;
     }
 });
+
 
 
 const brandsApi = createApi({
