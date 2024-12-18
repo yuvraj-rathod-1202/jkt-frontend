@@ -160,14 +160,7 @@ useEffect(() => {
           </label>
         </div>
 
-        {/* Old Price */}
-        <InputField
-          label="Old Price"
-          name="oldPrice"
-          type="number"
-          placeholder="Old Price"
-          register={register}
-        />
+        
 
         {/* New Price */}
         <InputField
