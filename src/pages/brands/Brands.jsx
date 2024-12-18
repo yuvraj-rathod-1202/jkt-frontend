@@ -10,10 +10,11 @@ const Brands = () => {
         window.scrollTo(0, 0);
     }, []);
 
-    let brands;
+    let brands = {};
     const getresponse = async () => {
     const response = await axios.get(`${getBaseUrl()}/api/brands/`);
     console.log(response);
+    console.log(response.data.Brands);
     brands = response.data.Brands;
     }
     const navigate = useNavigate();
