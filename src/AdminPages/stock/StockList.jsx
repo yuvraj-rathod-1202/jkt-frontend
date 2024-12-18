@@ -7,7 +7,7 @@ import { FaRupeeSign } from "react-icons/fa";
 const StockList = () => {
 
     const {data: stocksO = [], refetch} = useFetchAllStocksQuery();
-    const stocks = stocksO.Stocks;
+    const stocks = stocksO.data.Stocks;
 
     const [deleteStock] = useDeleteStockMutation();
 

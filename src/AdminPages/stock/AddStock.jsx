@@ -27,7 +27,7 @@ const AddStock = () => {
   const [mobileNo, setmobileNo] = useState(0);
 
   const { data: response = {}, isLoadingi, isErrori } = useFetchAllItemsQuery();
-  const items = response?.items || []; // Ensure `items` defaults to an empty array if undefined
+  const items = response.data.items || []; // Ensure `items` defaults to an empty array if undefined
 
   // Watch for changes in the itemId and itemQuantity fields
   const watchedItemId = watch("itemName");

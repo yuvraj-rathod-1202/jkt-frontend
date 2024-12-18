@@ -4,8 +4,6 @@ import SelectField from "./SelectField";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { useAddItemMutation } from "../../redux/features/items/itemsApi";
-import { useFetchAllCategoriesQuery } from "../../redux/features/categories/categoriesApi";
-import { useFetchAllBrandsQuery } from "../../redux/features/brands/brandApi";
 
 
 const AddItem = () => {
@@ -19,11 +17,41 @@ const AddItem = () => {
   const [imageFileName, setimageFileName] = useState("");
   const [addItem, { isLoading, error }] = useAddItemMutation();
 
-  const { data: categoryO = [], refetchc } = useFetchAllCategoriesQuery();
-  const categories = categoryO.Categorys;
+  const [categories, setcategories] = useState([]);
 
-  const { data: brandsO = [], refetchb } = useFetchAllBrandsQuery();
-  const brands = brandsO.Brands;
+  useEffect(() => {
+    const getResponse = async () => {
+        try {
+            const response = await axios.get(`${getBaseUrl()}/api/categories/`);
+            console.log(response);
+            console.log(response.data.Categorys);
+            setcategories(response.data.Categorys); // Set brands data to state
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
+
+    getResponse(); // Call the async function inside useEffect
+    window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
+
+
+const [brands, setBrands] = useState([]);
+useEffect(() => {
+  const getResponse = async () => {
+      try {
+          const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+          console.log(response);
+          console.log(response.data.Brands);
+          setBrands(response.data.Brands); // Set brands data to state
+      } catch (error) {
+          console.error("Error fetching brands:", error);
+      }
+  };
+
+  getResponse(); // Call the async function inside useEffect
+  window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
   
   const onSubmit = async (data) => {
     console.log(data);

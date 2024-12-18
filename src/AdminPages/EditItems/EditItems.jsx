@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 const EditItems = () => {
 
     const {data: itemsO = [], refetch} = useFetchAllItemsQuery();
-    const items = itemsO.items;
+    const items = itemsO.data.items;
 
     const [deleteItem] = useDeleteItemMutation();
 

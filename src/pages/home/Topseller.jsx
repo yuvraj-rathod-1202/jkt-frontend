@@ -1,22 +1,37 @@
-import React from "react";
-import { useFetchAllItemsQuery } from "../../redux/features/items/itemsApi";
+import React, { useState } from "react";
 import ItemCard from "./itemCard";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Navigation } from 'swiper/modules';
 import { Link } from "react-router-dom";
-import Loading from "../../components/Loading";
+import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 const Topseller = () => {
-    const { data, isLoading, isError } = useFetchAllItemsQuery();
+    
 
-    // Handle loading and error states
-    if (isLoading) return <Loading />
-    if (isError) return <div>Error loading items</div>;
+    const [items, setitems] = useState([]);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    })
 
-    // Ensure `items` is an array
-    const items = Array.isArray(data) ? data : data?.items || [];
+    useEffect(() => {
+        const getResponse = async () => {
+            try {
+                const response = await axios.get(`${getBaseUrl()}/api/items/`);
+                console.log(response);
+                console.log(response.data.items);
+                setitems(response.data.items); // Set brands data to state
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        getResponse(); // Call the async function inside useEffect
+        window.scrollTo(0, 0);
+    }, []); // Empty dependency array ensures this runs only once after component mounts
+
 
     return (
         <div className="mb-4 bg-green-50 rounded-lg">

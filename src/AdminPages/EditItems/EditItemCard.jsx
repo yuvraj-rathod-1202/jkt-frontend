@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 const EditItemCard = () => {
 
     const {data: itemsO = [], refetch} = useFetchAllItemsQuery();
-    const items = itemsO.items;
+    const items = itemsO.data.items;
 
     const [deleteItem] = useDeleteItemMutation();
 

@@ -7,7 +7,7 @@ import { ImCross } from "react-icons/im";
 
 const EditCategory = () => {
     const {data: categoryO = [], refetch} = useFetchAllCategoriesQuery();
-        const categories = categoryO.Categorys;
+        const categories = categoryO.data.Categorys;
         console.log(categories);
     
         const [deletecategories] = useDeleteCategoryMutation();

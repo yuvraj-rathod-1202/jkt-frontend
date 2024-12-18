@@ -8,7 +8,7 @@ import { ImCross } from "react-icons/im";
 const EditBrand = () => {
 
     const {data: brandsO = [], refetch} = useFetchAllBrandsQuery();
-    const brands = brandsO.Brands;
+    const brands = brandsO.data.Brands;
     console.log(brands);
     
 

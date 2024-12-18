@@ -1,22 +1,33 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import bird from '../../assets/items/gameBird.png';
-import { useFetchBrandByConditionQuery } from "../../redux/features/brands/brandApi";
-import Loading from "../../components/Loading";
+import getBaseUrl from "../../utils/baseURL";
+import axios from "axios";
 
 const Brand = () => {
+    const [brands, setBrands] = useState([]);
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    // Destructure data from the query
-    const { data: response = {}, isLoading, isError } = useFetchBrandByConditionQuery(true);
+    useEffect(() => {
+        const getResponse = async () => {
+            try {
+                const response = await axios.get(`${getBaseUrl()}/api/brands/brand/true`);
+                console.log(response);
+                console.log(response.data.Brands);
+                setBrands(response.data.Brands); // Set brands data to state
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
 
-    if (isLoading) return <Loading />
-    if (isError) return <div>Error loading brands.</div>;
+        getResponse(); // Call the async function inside useEffect
+        window.scrollTo(0, 0);
+    }, []); // Empty dependency array ensures this runs only once after component mounts
 
-    // Access the Brands array from the response
-    const brands = response.Brands || [];
+
+    
 
     return (
         <div className="mb-4 bg-neutral-100 rounded-lg">

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useFetchAllItemsQuery } from '../../redux/features/items/itemsApi';
 import ItemCard from "../home/itemCard";
 import axios from "axios";
 import getBaseUrl from "../../utils/baseURL";

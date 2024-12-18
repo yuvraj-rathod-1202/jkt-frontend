@@ -21,10 +21,10 @@ const AddItem = () => {
   
 
   const { data: categoryO = [], refetchc } = useFetchAllCategoriesQuery();
-  const categories = categoryO.Categorys;
+  const categories = categoryO.data.Categorys;
 
   const { data: brandsO = [], refetchb } = useFetchAllBrandsQuery();
-  const brands = brandsO.Brands;
+  const brands = brandsO.data.Brands;
 
   const {id} = useParams();
   console.log(id)

@@ -1,27 +1,36 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import bird from "../../assets/items/gameBird.png";
-import { useFetchCategoryByConditionQuery } from "../../redux/features/categories/categoriesApi";
-import Loading from "../../components/Loading";
+import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 const Brand = () => {
+
+  const [categories, setcategories] = useState([]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    const getResponse = async () => {
+        try {
+            const response = await axios.get(`${getBaseUrl()}/api/categories/category/true`);
+            console.log(response);
+            console.log(response.data.Categorys);
+            setcategories(response.data.Categorys); // Set brands data to state
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
+
+    getResponse(); // Call the async function inside useEffect
+    window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
+
   // Destructure data from the query
-  const {
-    data: response = {},
-    isLoading,
-    isError,
-  } = useFetchCategoryByConditionQuery(true);
+  
 
-  if (isLoading) return <Loading />
-  if (isError) return <div>Error loading categories.</div>;
 
-  // Access the categories array from the response
-  const categories = response.category || [];
-  console.log(categories);
 
   return (
     <div className="mb-4 bg-white rounded-lg">
