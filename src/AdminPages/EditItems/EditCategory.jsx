@@ -46,7 +46,7 @@ const EditCategory = () => {
                                 text: "Your category has been deleted.",
                                 icon: "success"
                             });
-                          refetch();
+                          window.location.reload();
                         }
                       });
                    

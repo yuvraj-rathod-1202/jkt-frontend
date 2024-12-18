@@ -44,7 +44,7 @@ const EditItems = () => {
                         text: "Your item has been deleted.",
                         icon: "success"
                     });
-                  refetch();
+                  window.location.reload();
                 }
               });
            

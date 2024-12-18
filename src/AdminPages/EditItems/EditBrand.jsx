@@ -46,7 +46,7 @@ const EditBrand = () => {
                             text: "Your brand has been deleted.",
                             icon: "success"
                         });
-                      refetch();
+                      window.location.reload();
                     }
                   });
                
