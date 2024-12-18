@@ -48,7 +48,7 @@ const Brand = () => {
       </div>
       <div className="p-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 w-full content-center mx-auto gap-4 justify-center shadow-sm shadow-green-500 bg-gray-200">
-          {categories.length > 0 ? (
+          {categories ? (
             categories.map((brand, index) => (
               <Link
                 key={brand._id}

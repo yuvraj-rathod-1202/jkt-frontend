@@ -13,7 +13,7 @@ const totalBrands = async () => {
 
     // Ensure `brands` is an array before returning its length
     if (Array.isArray(data.Brands)) {
-      return (data.Brands.length);
+      return (data.data.Brands.length);
     } else {
       throw new Error("Invalid data format: 'brands' is not an array.");
     }
