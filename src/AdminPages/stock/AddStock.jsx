@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useFetchAllItemsQuery } from "../../redux/features/items/itemsApi";
 import { useForm } from "react-hook-form";
 import {
   useAddCustomerMutation,
-  useFetchCustomerByConditionQuery,
 } from "../../redux/features/customers/customerApi";
 import { useAddStockMutation } from "../../redux/features/Stocks/stocksApi";
 import Swal from "sweetalert2";
 import axios from "axios";
 import getBaseUrl from "../../utils/baseURL";
-import Loading from "../../components/Loading";
+
 
 const AddStock = () => {
   const {
@@ -26,8 +24,23 @@ const AddStock = () => {
   const [addStock] = useAddStockMutation();
   const [mobileNo, setmobileNo] = useState(0);
 
-  const { data: response = {}, isLoadingi, isErrori } = useFetchAllItemsQuery();
-  const items = response.data.items || []; // Ensure `items` defaults to an empty array if undefined
+  const [items, setitems] = useState([]);
+
+    useEffect(() => {
+        const getResponse = async () => {
+            try {
+                const response = await axios.get(`${getBaseUrl()}/api/items/`);
+                console.log(response);
+                console.log(response.data.items);
+                setitems(response.data.items); // Set brands data to state
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        getResponse(); // Call the async function inside useEffect
+        window.scrollTo(0, 0);
+    }, []); // Empty dependency array ensures this runs only once after component mounts
 
   // Watch for changes in the itemId and itemQuantity fields
   const watchedItemId = watch("itemName");

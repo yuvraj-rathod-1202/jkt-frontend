@@ -7,9 +7,6 @@ import getBaseUrl from "../../utils/baseURL";
 
 const Categories = () => {
   const [categories, setcategories] = useState([]);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   useEffect(() => {
     const getResponse = async () => {
@@ -27,6 +24,10 @@ const Categories = () => {
     window.scrollTo(0, 0);
 }, []); // Empty dependency array ensures this runs only once after component mounts
   
+
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
   const navigate = useNavigate();
   
  

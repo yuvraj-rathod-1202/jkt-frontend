@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "../../AdminPages/AddItems/InputField";
 import SelectField from "../../AdminPages/AddItems/SelectField";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import { useFetchAllCategoriesQuery } from "../../redux/features/categories/categoriesApi";
-import { useFetchAllBrandsQuery } from "../../redux/features/brands/brandApi";
 import { useParams } from "react-router-dom";
 import getBaseUrl from "../../utils/baseURL";
 import axios from 'axios'
@@ -20,11 +18,42 @@ const AddItem = () => {
   const [imageFileName, setimageFileName] = useState("");
   
 
-  const { data: categoryO = [], refetchc } = useFetchAllCategoriesQuery();
-  const categories = categoryO.data.Categorys;
+  const [categories, setcategories] = useState([]);
 
-  const { data: brandsO = [], refetchb } = useFetchAllBrandsQuery();
-  const brands = brandsO.data.Brands;
+  useEffect(() => {
+    const getResponse = async () => {
+        try {
+            const response = await axios.get(`${getBaseUrl()}/api/categories/`);
+            console.log(response);
+            console.log(response.data.Categorys);
+            setcategories(response.data.Categorys); // Set brands data to state
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
+
+    getResponse(); // Call the async function inside useEffect
+    window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
+
+const [brands, setBrands] = useState([]); // State to hold the brands data
+    
+
+useEffect(() => {
+    const getResponse = async () => {
+        try {
+            const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+            console.log(response);
+            console.log(response.data.Brands);
+            setBrands(response.data.Brands); // Set brands data to state
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
+
+    getResponse(); // Call the async function inside useEffect
+    window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
 
   const {id} = useParams();
   console.log(id)

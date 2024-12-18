@@ -11,7 +11,7 @@ const totalCustomers = async () => {
         const data = await response.json();
 
         if (Array.isArray(data.customers)) {
-            return (data.data.customers.length);
+            return (data.customers.length);
           } else {
             throw new Error("Invalid data format: 'brands' is not an array.");
           }

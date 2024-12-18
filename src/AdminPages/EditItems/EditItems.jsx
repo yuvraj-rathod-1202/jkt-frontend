@@ -1,12 +1,29 @@
-import React from "react";
-import { useDeleteItemMutation, useFetchAllItemsQuery } from '../../redux/features/items/itemsApi.js';
+import React, { useEffect, useState } from "react";
+import { useDeleteItemMutation } from '../../redux/features/items/itemsApi.js';
 import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
+import getBaseUrl from "../../utils/baseURL.js";
+import axios from "axios";
 
 const EditItems = () => {
 
-    const {data: itemsO = [], refetch} = useFetchAllItemsQuery();
-    const items = itemsO.data.items;
+    const [items, setitems] = useState([]);
+
+    useEffect(() => {
+        const getResponse = async () => {
+            try {
+                const response = await axios.get(`${getBaseUrl()}/api/items/`);
+                console.log(response);
+                console.log(response.data.items);
+                setitems(response.data.items); // Set brands data to state
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        getResponse(); // Call the async function inside useEffect
+        window.scrollTo(0, 0);
+    }, []); // Empty dependency array ensures this runs only once after component mounts
 
     const [deleteItem] = useDeleteItemMutation();
 

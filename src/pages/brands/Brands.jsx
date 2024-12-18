@@ -6,7 +6,7 @@ import axios from "axios";
 
 const Brands = () => {
     const [brands, setBrands] = useState([]); // State to hold the brands data
-    const navigate = useNavigate();
+    
 
     useEffect(() => {
         const getResponse = async () => {
@@ -24,6 +24,8 @@ const Brands = () => {
         window.scrollTo(0, 0);
     }, []); // Empty dependency array ensures this runs only once after component mounts
 
+    const navigate = useNavigate();
+    
     const handleBack = () => {
         navigate(-1); // Navigate back to the previous page
     };

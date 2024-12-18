@@ -1,14 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDeleteCategoryMutation, useFetchAllCategoriesQuery } from "../../redux/features/categories/categoriesApi";
+import { useDeleteCategoryMutation } from "../../redux/features/categories/categoriesApi";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
+import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 const EditCategory = () => {
-    const {data: categoryO = [], refetch} = useFetchAllCategoriesQuery();
-        const categories = categoryO.data.Categorys;
-        console.log(categories);
+   
+    const [categories, setcategories] = useState([]);
+
+  useEffect(() => {
+    const getResponse = async () => {
+        try {
+            const response = await axios.get(`${getBaseUrl()}/api/categories/`);
+            console.log(response);
+            console.log(response.data.Categorys);
+            setcategories(response.data.Categorys); // Set brands data to state
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
+
+    getResponse(); // Call the async function inside useEffect
+    window.scrollTo(0, 0);
+}, []); // Empty dependency array ensures this runs only once after component mounts
     
         const [deletecategories] = useDeleteCategoryMutation();
     

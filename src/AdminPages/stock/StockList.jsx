@@ -1,14 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
-import { useDeleteStockMutation, useFetchAllStocksQuery } from "../../redux/features/Stocks/stocksApi.js";
+import { useDeleteStockMutation } from "../../redux/features/Stocks/stocksApi.js";
 import { FaRupeeSign } from "react-icons/fa";
+import getBaseUrl from "../../utils/baseURL.js";
+import axios from "axios";
 
 const StockList = () => {
 
-    const {data: stocksO = [], refetch} = useFetchAllStocksQuery();
-    const stocks = stocksO.data.Stocks;
+    const [stocks, setstocks] = useState([]);
 
+    useEffect(() => {
+        const getResponse = async () => {
+            try {
+                const response = await axios.get(`${getBaseUrl()}/api/stocks/`);
+                console.log(response);
+                console.log(response.data.Stocks);
+                setstocks(response.data.Stocks); // Set brands data to state
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        getResponse(); // Call the async function inside useEffect
+        window.scrollTo(0, 0);
+    }, []); // Empty dependency array ensures this runs only once after component mounts
     const [deleteStock] = useDeleteStockMutation();
 
     const handleDeletestock = async (id) => {

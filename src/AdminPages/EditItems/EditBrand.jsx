@@ -1,16 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDeleteBrandMutation, useFetchAllBrandsQuery } from "../../redux/features/brands/brandApi";
+import { useDeleteBrandMutation } from "../../redux/features/brands/brandApi";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
+import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 const EditBrand = () => {
 
-    const {data: brandsO = [], refetch} = useFetchAllBrandsQuery();
-    const brands = brandsO.data.Brands;
-    console.log(brands);
+    const [brands, setBrands] = useState([]);
     
+    useEffect(() => {
+        const getResponse = async () => {
+            try {
+                const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+                console.log(response);
+                console.log(response.data.Brands);
+                setBrands(response.data.Brands); // Set brands data to state
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
+        getResponse(); // Call the async function inside useEffect
+        window.scrollTo(0, 0);
+    }, []); // Empty dependency array ensures this runs only once after component mounts
 
     const [deleteBrands] = useDeleteBrandMutation();
 
