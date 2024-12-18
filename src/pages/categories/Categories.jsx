@@ -12,7 +12,7 @@ const Categories = () => {
   useEffect(() => {
     const getResponse = async () => {
         try {
-            const response = await axios.get(`${getBaseUrl()}/api/brands/`);
+            const response = await axios.get(`${getBaseUrl()}/api/categories/`);
             console.log(response);
             console.log(response.data.Categorys);
             setcategories(response.data.Categorys); // Set brands data to state
