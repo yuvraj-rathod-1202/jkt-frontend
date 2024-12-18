@@ -3,15 +3,18 @@ import getBaseUrl from '../../../utils/baseURL'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: `${getBaseUrl()}/api/brands`,
-    credentials: 'include',
-    prepareHeaders: (Headers) => {
-        const token = localStorage.getItem('token');
+    credentials: 'include', // Ensures cookies are sent
+    prepareHeaders: (headers) => {
+        // Add Authorization token if required
+        const token = localStorage.getItem('token'); // Replace this with your token retrieval logic
         if (token) {
-            Headers.set('Authorization', `Bearer ${token}`);
+            headers.set('Authorization', `Bearer ${token}`);
         }
-        return Headers;
+        headers.set('Content-Type', 'application/json'); // Ensure JSON content type
+        return headers;
     }
-})
+});
+
 
 const brandsApi = createApi({
     reducerPath: 'brandApi',
