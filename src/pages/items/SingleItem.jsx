@@ -3,19 +3,20 @@ import { useFetchItemByIdQuery } from "../../redux/features/items/itemsApi";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import bird from '../../assets/items/gameBird.png';
 import Loading from "../../components/Loading";
+import axios from "axios";
+import getBaseUrl from "../../utils/baseURL";
 
 const SingleItem = () => {
     const { id } = useParams();
-    const { data: itemObj = {}, isLoading, isError } = useFetchItemByIdQuery(id);
-    const item = itemObj.item;
+    const itemObj = axios.get(`${getBaseUrl()}/api/items/${id}`);
+    const item = itemObj.data.item;
     const navigate = useNavigate(); // Initialize useNavigate hook
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    if (isLoading) return <Loading />
-    if (isError) return <div>Error occurred while loading item info</div>;
+
 
     // Check if item has necessary properties
     if (!item || !item._id || !item.name) {

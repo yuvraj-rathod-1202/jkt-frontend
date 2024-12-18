@@ -183,7 +183,7 @@ useEffect(() => {
           type="submit"
           className="w-full py-2 bg-green-500 text-white font-bold rounded-md"
         >
-          {isLoading ? <span>Adding..</span> : <span>Add Item</span>}
+          <span>Add Item</span>
         </button>
       </form>
     </div>
