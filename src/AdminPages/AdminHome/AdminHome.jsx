@@ -10,6 +10,7 @@ import { FaArrowTrendUp } from "react-icons/fa6";
 import { FaUserAlt } from "react-icons/fa";
 import totalCustomers from "../counts/totalCustomers";
 import totalSell from "../counts/totalSell";
+import DailyRevenueChart from "../Graphs/DailyRevenueChart";
 
 const AdminHome = () => {
   const [itemCount, setItemCount] = useState(null); // Initialize state to store the resolved value
@@ -34,7 +35,7 @@ const AdminHome = () => {
     }
 
     fetchTotalItems();
-    console.log(sellCount)
+    console.log(sellCount);
   }, []); // Empty dependency array to run only on component mount
 
   return (
@@ -64,7 +65,7 @@ const AdminHome = () => {
           {itemCount !== null ? (
             <>
               <AiFillProduct />
-              {itemCount}  Items
+              {itemCount} Items
             </>
           ) : (
             <Loading />
@@ -75,7 +76,7 @@ const AdminHome = () => {
           {brandCount !== null ? (
             <>
               <MdBrandingWatermark />
-              {brandCount}  Brands
+              {brandCount} Brands
             </>
           ) : (
             <Loading />
@@ -86,7 +87,7 @@ const AdminHome = () => {
           {brandCount !== null ? (
             <>
               <FaUserAlt />
-              {customerCount}  Customer
+              {customerCount} Customer
             </>
           ) : (
             <Loading />
@@ -97,13 +98,24 @@ const AdminHome = () => {
           {brandCount !== null ? (
             <>
               <FaArrowTrendUp />
-               {Number(sellCount/1000)} K    sell
+              {Number(sellCount / 1000)} K sell
             </>
           ) : (
             <Loading />
           )}
         </div>
-
+      </div>
+      <div>
+        <div className="flex flex-col md:col-span-2 md:row-span-2 bg-white shadow rounded-lg">
+          <div className="px-6 py-5 font-semibold border-b border-gray-100">
+            The number of orders per month
+          </div>
+          <div className="p-4 flex-grow">
+            <div className="flex items-center justify-center h-full px-4 py-16 text-gray-400 text-3xl font-semibold bg-gray-100 border-2 border-gray-200 border-dashed rounded-md">
+              <DailyRevenueChart />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
