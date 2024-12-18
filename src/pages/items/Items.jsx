@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFetchAllItemsQuery } from '../../redux/features/items/itemsApi';
 import ItemCard from "../home/itemCard";
+import axios from "axios";
 
 const Items = () => {
     const [items, setitems] = useState([]);
