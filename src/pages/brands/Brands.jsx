@@ -19,7 +19,7 @@ const Brands = () => {
     }
     const navigate = useNavigate();
     getresponse();
-    console.log(brands);
+    console.log(brands.data.Brands);
     
 
     const handleBack = () => {
