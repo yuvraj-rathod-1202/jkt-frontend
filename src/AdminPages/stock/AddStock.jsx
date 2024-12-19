@@ -93,7 +93,7 @@ const AddStock = () => {
         newCustomerData = {
           name: newStockData.buyerName,
           mobileNo: Number(newStockData.buyerMobileNo),
-          paid: Number(newStockData.paid),
+          paid: Number(newStockData.totalPrice),
           unpaid: 0,
           orders: [addedStock._id],
         };
