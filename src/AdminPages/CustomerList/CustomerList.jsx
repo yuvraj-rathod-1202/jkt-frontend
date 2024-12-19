@@ -14,8 +14,8 @@ const CustomerList = () => {
             try {
                 const response = await axios.get(`${getBaseUrl()}/api/customers/`);
                 console.log(response);
-                console.log(response.data.Customers);
-                setcustomers(response.data.Customers); // Set brands data to state
+                console.log(response.data.customers);
+                setcustomers(response.data.customers); // Set brands data to state
             } catch (error) {
                 console.error("Error fetching brands:", error);
             }
