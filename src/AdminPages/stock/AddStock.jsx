@@ -88,11 +88,24 @@ const AddStock = () => {
 
       if (customer === "") {
         // Add a new customer
-        const newCustomerData = {
+        let newCustomerData = ""
+        if (newStockData.paymentStatus === "true"){
+        newCustomerData = {
           name: newStockData.buyerName,
           mobileNo: Number(newStockData.buyerMobileNo),
+          paid: Number(newStockData.paid),
+          unpaid: 0,
           orders: [addedStock._id],
         };
+      }else{
+        newCustomerData = {
+          name: newStockData.buyerName,
+          mobileNo: Number(newStockData.buyerMobileNo),
+          paid: 0,
+          unpaid: Number(newStockData.totalPrice),
+          orders: [addedStock._id],
+        };
+      }
 
         await axios.post(
           `${getBaseUrl()}/api/customers/create-customer`,
@@ -106,11 +119,33 @@ const AddStock = () => {
       } else {
         // Update existing customer
         const updatedOrders = [...customer.orders, addedStock._id];
-        await axios.put(`${getBaseUrl()}/api/customers/edit/${customer._id}`, {name: customer.name, mobileNo: customer.mobileNo ,orders: updatedOrders}, {
+
+        if (newStockData.paymentStatus === "true"){
+        await axios.put(`${getBaseUrl()}/api/customers/edit/${customer._id}`, {
+          name: customer.name,
+          mobileNo: customer.mobileNo,
+          paid: customer.paid + Number(newStockData.totalPrice),
+          unpaid: customer.unpaid,
+          orders: updatedOrders
+        }, {
           headers: {
             'Content-Type': 'application/json',
           }
         });
+      }else{
+        await axios.put(`${getBaseUrl()}/api/customers/edit/${customer._id}`, {
+          name: customer.name,
+          mobileNo: customer.mobileNo,
+          paid: customer.paid,
+          unpaid: customer.unpaid + Number(newStockData.totalPrice),
+          orders: updatedOrders
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      }
+
       }
 
       // Show success message

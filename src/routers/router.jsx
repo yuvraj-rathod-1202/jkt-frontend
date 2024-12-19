@@ -16,6 +16,7 @@ import EditItem from "../pages/items/EditItem";
 import Bill from "../AdminPages/Bill/Bill";
 import AddStock from "../AdminPages/stock/AddStock";
 import StockList from "../AdminPages/stock/StockList";
+import CustomerList from "../AdminPages/CustomerList/CustomerList";
 
 
 const router = createBrowserRouter([
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
             {
                 path: "bill",
                 element: <Bill />
+            },
+            {
+                path: "customerList",
+                element: <CustomerList />
             },
             {
                 path: "stock",

@@ -55,6 +55,9 @@ const Navbar = () => {
                     <Link to = "/admin/stocklist" className='flex items-center hover:bg-green-600 gap-4 px-4 py-2 rounded-md'>
                         Stock List <CgShutterstock />
                     </Link>
+                    <Link to = "/admin/customerList" className='flex items-center hover:bg-green-600 gap-4 px-4 py-2 rounded-md'>
+                        Customer List <CgShutterstock />
+                    </Link>
 
                     <div className="absolute bottom-4 left-0 px-4">
                     <button className="flex items-center bg-red-600 hover:bg-red-500 px-2 py-2 w-full rounded-md">
