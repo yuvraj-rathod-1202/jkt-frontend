@@ -86,13 +86,13 @@ const CustomerList = () => {
     
                                        <FaRupeeSign /> {customer.paid}
                                     </td>
-                                    <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex flex-row">
                                       <FaRupeeSign /> {customer.unpaid}
                                     </td>
                                     <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                       {customer.orders.length}
                                     </td>
-                                    <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex flex-row">
                                       <FaRupeeSign />{customer.paid + customer.unpaid}
                                     </td>
                                     
