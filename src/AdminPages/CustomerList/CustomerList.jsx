@@ -71,9 +71,9 @@ const CustomerList = () => {
                 {customers &&
                   customers.map((customer, index) => (
                     <tr key={customer.id || index}>
-                      <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-gray-700">
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-gray-700">
                         {index + 1}
-                      </th>
+                      </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                         {customer.name || "N/A"}
                       </td>
