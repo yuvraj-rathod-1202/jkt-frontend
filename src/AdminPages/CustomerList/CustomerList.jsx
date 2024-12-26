@@ -80,21 +80,29 @@ const CustomerList = () => {
                       <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                         {customer.mobileNo || "N/A"}
                       </td>
-                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
-                        <FaRupeeSign /> <p>{Number(customer.paid) || 0}</p>
+                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <span className="inline-flex items-center">
+                          <FaRupeeSign className="mr-1" />
+                          <p>{Number(customer.paid) || 0}</p>
+                        </span>
                       </td>
-                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
-                        <FaRupeeSign /> <p>{Number(customer.unpaid) || 0}</p>
+                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <span className="inline-flex items-center">
+                          <FaRupeeSign className="mr-1" />
+                          <p>{Number(customer.unpaid) || 0}</p>
+                        </span>
                       </td>
                       <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                         {customer.orders?.length || 0}
                       </td>
-                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
-                        <FaRupeeSign />{" "}
-                        <p>
-                          {Number(customer.paid || 0) +
-                            Number(customer.unpaid || 0)}
-                        </p>
+                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <span className="inline-flex items-center">
+                          <FaRupeeSign className="mr-1" />
+                          <p>
+                            {Number(customer.paid || 0) +
+                              Number(customer.unpaid || 0)}
+                          </p>
+                        </span>
                       </td>
                     </tr>
                   ))}
