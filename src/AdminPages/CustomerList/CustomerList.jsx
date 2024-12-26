@@ -84,16 +84,16 @@ const CustomerList = () => {
                                     </td>
                                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex flex-row">
     
-                                       <FaRupeeSign /> {customer.paid}
+                                       <FaRupeeSign /> <p>{customer.paid}</p>
                                     </td>
                                     <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex flex-row">
-                                      <FaRupeeSign /> {customer.unpaid}
+                                      <FaRupeeSign /> <p>{customer.unpaid}</p>
                                     </td>
                                     <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                       {customer.orders.length}
                                     </td>
                                     <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex flex-row">
-                                      <FaRupeeSign />{customer.paid + customer.unpaid}
+                                      <FaRupeeSign /><p>{customer.paid + customer.unpaid}</p>
                                     </td>
                                     
                                 </tr> 
