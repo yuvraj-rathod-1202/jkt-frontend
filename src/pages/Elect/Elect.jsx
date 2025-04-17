@@ -43,12 +43,12 @@ export default function ElectDashboard() {
       setError(null);
       try {
         const query = buildQuery();
-        const resp = await fetch(`https://jkt-backend.vercel.app/api/elect/`);
+        const resp = await fetch(`/api/elect?${query}`);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
         // Map to chart-friendly format
         const chartData = json.map(item => ({
-          time: new Date(item.time).toLocaleString(),
+          time: new Date(item.time),
           temperature: parseFloat(item.tempreature),
           humidity: parseFloat(item.humidity),
           moisture: parseFloat(item.moisture),
@@ -67,6 +67,12 @@ export default function ElectDashboard() {
   // Handle sensor checkbox toggles
   const toggleSensor = (key) => {
     setSelectedSensors(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Format X-axis ticks as locale date/time
+  const formatXAxis = (tick) => {
+    const date = new Date(tick);
+    return `${date.getDate()}/${date.getMonth() + 1} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
 
   return (
@@ -95,9 +101,9 @@ export default function ElectDashboard() {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
         </div>
-        <div className="col-span-2 flex items-center space-x-4">
+        <div className="col-span-2 flex items-center space-x-4 flex-wrap">
           {Object.keys(selectedSensors).map(key => (
-            <label key={key} className="inline-flex items-center">
+            <label key={key} className="inline-flex items-center mr-4 mt-2">
               <input
                 type="checkbox"
                 checked={selectedSensors[key]}
@@ -117,23 +123,61 @@ export default function ElectDashboard() {
       {/* Charts */}
       {!loading && !error && (
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+          <LineChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+            <XAxis
+              dataKey="time"
+              tickFormatter={formatXAxis}
+              angle={-45}
+              textAnchor="end"
+              height={60}
+              tick={{ fontSize: 12 }}
+            />
             <YAxis />
-            <Tooltip />
+            <Tooltip labelFormatter={label => {
+              const date = new Date(label);
+              return date.toLocaleString();
+            }} />
             <Legend />
+
             {selectedSensors.temperature && (
-              <Line type="monotone" dataKey="temperature" dot={false} strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="temperature"
+                dot={false}
+                stroke="#ff7300"
+                strokeWidth={2}
+              />
             )}
             {selectedSensors.humidity && (
-              <Line type="monotone" dataKey="humidity" dot={false} strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="humidity"
+                dot={false}
+                stroke="#387908"
+                strokeWidth={2}
+              />
             )}
             {selectedSensors.moisture && (
-              <Line type="monotone" dataKey="moisture" dot={false} strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="moisture"
+                dot={false}
+                stroke="#8884d8"
+                strokeWidth={2}
+              />
             )}
             {selectedSensors.pollution && (
-              <Line type="monotone" dataKey="pollution" dot={false} strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="pollution"
+                dot={false}
+                stroke="#82ca9d"
+                strokeWidth={2}
+              />
             )}
           </LineChart>
         </ResponsiveContainer>
@@ -141,4 +185,3 @@ export default function ElectDashboard() {
     </div>
   );
 }
-
