@@ -17,6 +17,7 @@ import Bill from "../AdminPages/Bill/Bill";
 import AddStock from "../AdminPages/stock/AddStock";
 import StockList from "../AdminPages/stock/StockList";
 import CustomerList from "../AdminPages/CustomerList/CustomerList";
+import ElectDashboard from "../pages/Elect/Elect";
 
 
 const router = createBrowserRouter([
@@ -120,6 +121,10 @@ const router = createBrowserRouter([
             }
 
         ]
+    },
+    {
+        path: "/elect/analysis",
+        element: <ElectDashboard />
     }
 ])
 
