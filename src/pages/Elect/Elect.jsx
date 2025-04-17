@@ -9,7 +9,8 @@ import {
   Tooltip,
   Legend,
   CartesianGrid,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Label
 } from 'recharts';
 
 export default function ElectDashboard() {
@@ -28,6 +29,13 @@ export default function ElectDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Compute user's timezone offset string
+  const tzOffsetMinutes = -new Date().getTimezoneOffset();
+  const tzSign = tzOffsetMinutes >= 0 ? '+' : '-';
+  const tzHours = String(Math.floor(Math.abs(tzOffsetMinutes) / 60)).padStart(2, '0');
+  const tzMins = String(Math.abs(tzOffsetMinutes) % 60).padStart(2, '0');
+  const tzString = `UTC${tzSign}${tzHours}:${tzMins}`;
+
   // Build query params from filters
   const buildQuery = () => {
     const params = new URLSearchParams();
@@ -43,10 +51,9 @@ export default function ElectDashboard() {
       setError(null);
       try {
         const query = buildQuery();
-        const resp = await fetch(`https://jkt-backend.vercel.app/api/elect`);
+        const resp = await fetch(`https://jkt-backend.vercel.app/api/elect/`);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
-        // Map to chart-friendly format
         const chartData = json.map(item => ({
           time: new Date(item.time),
           temperature: parseFloat(item.tempreature),
@@ -69,15 +76,22 @@ export default function ElectDashboard() {
     setSelectedSensors(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Format X-axis ticks as locale date/time
+  // Format X-axis ticks with local timezone
   const formatXAxis = (tick) => {
     const date = new Date(tick);
-    return `${date.getDate()}/${date.getMonth() + 1} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return date.toLocaleString(undefined, {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
   };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Environmental Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-1">Environmental Dashboard</h1>
+      <p className="text-sm text-gray-500 mb-4">All times shown in {tzString}</p>
 
       {/* Filter Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -135,12 +149,13 @@ export default function ElectDashboard() {
               textAnchor="end"
               height={60}
               tick={{ fontSize: 12 }}
-            />
+            >
+              <Label value={`Time (${tzString})`} position="bottom" offset={0} />
+            </XAxis>
             <YAxis />
-            <Tooltip labelFormatter={label => {
-              const date = new Date(label);
-              return date.toLocaleString();
-            }} />
+            <Tooltip
+              labelFormatter={label => new Date(label).toLocaleString(undefined, { timeZoneName: 'short' })}
+            />
             <Legend />
 
             {selectedSensors.temperature && (
