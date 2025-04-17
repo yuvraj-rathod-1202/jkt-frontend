@@ -43,7 +43,7 @@ export default function ElectDashboard() {
       setError(null);
       try {
         const query = buildQuery();
-        const resp = await fetch(`/api/elect?${query}`);
+        const resp = await fetch(`https://jkt-backend.vercel.app/api/elect`);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
         // Map to chart-friendly format
