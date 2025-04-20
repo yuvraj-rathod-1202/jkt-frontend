@@ -199,6 +199,8 @@ export default function ElectDashboard() {
                 dot={false}
                 stroke="#ff7300"
                 strokeWidth={2}
+                style={{ marginTop: "20px" }}
+                activeDot={{ r: 8 }}
               />
             )}
             {selectedSensors.humidity && (
@@ -208,6 +210,8 @@ export default function ElectDashboard() {
                 dot={false}
                 stroke="#387908"
                 strokeWidth={2}
+                style={{ marginTop: "20px" }}
+                activeDot={{ r: 8 }}
               />
             )}
             {selectedSensors.moisture && (
@@ -217,6 +221,8 @@ export default function ElectDashboard() {
                 dot={false}
                 stroke="#8884d8"
                 strokeWidth={2}
+                style={{ marginTop: "20px" }}
+                activeDot={{ r: 8 }}
               />
             )}
             {selectedSensors.pollution && (
@@ -226,6 +232,8 @@ export default function ElectDashboard() {
                 dot={false}
                 stroke="#82ca9d"
                 strokeWidth={2}
+                style={{ marginTop: "20px" }}
+                activeDot={{ r: 8 }}
               />
             )}
           </LineChart>
