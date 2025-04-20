@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   LineChart,
   Line,
@@ -10,8 +10,8 @@ import {
   Legend,
   CartesianGrid,
   ResponsiveContainer,
-  Label
-} from 'recharts';
+  Label,
+} from "recharts";
 
 export default function ElectDashboard() {
   // Filter states
@@ -21,7 +21,7 @@ export default function ElectDashboard() {
     temperature: true,
     humidity: true,
     moisture: true,
-    pollution: true
+    pollution: true,
   });
 
   // Data state
@@ -31,17 +31,38 @@ export default function ElectDashboard() {
 
   // Compute user's timezone offset string
   const tzOffsetMinutes = -new Date().getTimezoneOffset();
-  const tzSign = tzOffsetMinutes >= 0 ? '+' : '-';
-  const tzHours = String(Math.floor(Math.abs(tzOffsetMinutes) / 60)).padStart(2, '0');
-  const tzMins = String(Math.abs(tzOffsetMinutes) % 60).padStart(2, '0');
+  const tzSign = tzOffsetMinutes >= 0 ? "+" : "-";
+  const tzHours = String(Math.floor(Math.abs(tzOffsetMinutes) / 60)).padStart(
+    2,
+    "0"
+  );
+  const tzMins = String(Math.abs(tzOffsetMinutes) % 60).padStart(2, "0");
   const tzString = `UTC${tzSign}${tzHours}:${tzMins}`;
 
   // Build query params from filters
   const buildQuery = () => {
     const params = new URLSearchParams();
-    if (startDate) params.append('start', startDate.toISOString());
-    if (endDate) params.append('end', endDate.toISOString());
+    if (startDate) params.append("start", startDate.toISOString());
+    if (endDate) params.append("end", endDate.toISOString());
     return params.toString();
+  };
+
+  // Generate half-hour interval ticks from start to end
+  const generateHalfHourTicks = (data) => {
+    if (!data.length) return [];
+    const start = new Date(data[0].time);
+    const end = new Date(data[data.length - 1].time);
+    const ticks = [];
+
+    let current = new Date(start);
+    current.setMinutes(Math.floor(current.getMinutes() / 30) * 30, 0, 0); // Round to nearest half hour
+
+    while (current <= end) {
+      ticks.push(current.getTime());
+      current = new Date(current.getTime() + 30 * 60 * 1000); // Add 30 mins
+    }
+
+    return ticks;
   };
 
   // Fetch data whenever filters change
@@ -54,12 +75,12 @@ export default function ElectDashboard() {
         const resp = await fetch(`https://jkt-backend.vercel.app/api/elect/`);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
-        const chartData = json.map(item => ({
-          time: new Date(item.time),
+        const chartData = json.map((item) => ({
+          time: new Date(item.time).getTime(),
           temperature: parseFloat(item.tempreature),
           humidity: parseFloat(item.humidity),
           moisture: parseFloat(item.moisture),
-          pollution: parseFloat(item.pollution)
+          pollution: parseFloat(item.pollution),
         }));
         setData(chartData);
       } catch (err) {
@@ -73,25 +94,27 @@ export default function ElectDashboard() {
 
   // Handle sensor checkbox toggles
   const toggleSensor = (key) => {
-    setSelectedSensors(prev => ({ ...prev, [key]: !prev[key] }));
+    setSelectedSensors((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   // Format X-axis ticks with local timezone
   const formatXAxis = (tick) => {
     const date = new Date(tick);
     return date.toLocaleString(undefined, {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short",
     });
   };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-1">Environmental Dashboard</h1>
-      <p className="text-sm text-gray-500 mb-4">All times shown in {tzString}</p>
+      <p className="text-sm text-gray-500 mb-4">
+        All times shown in {tzString}
+      </p>
 
       {/* Filter Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -99,7 +122,7 @@ export default function ElectDashboard() {
           <label className="block text-sm font-medium">Start Date</label>
           <DatePicker
             selected={startDate}
-            onChange={date => setStartDate(date)}
+            onChange={(date) => setStartDate(date)}
             showTimeSelect
             dateFormat="yyyy-MM-dd HH:mm"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -109,14 +132,14 @@ export default function ElectDashboard() {
           <label className="block text-sm font-medium">End Date</label>
           <DatePicker
             selected={endDate}
-            onChange={date => setEndDate(date)}
+            onChange={(date) => setEndDate(date)}
             showTimeSelect
             dateFormat="yyyy-MM-dd HH:mm"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
         </div>
         <div className="col-span-2 flex items-center space-x-4 flex-wrap">
-          {Object.keys(selectedSensors).map(key => (
+          {Object.keys(selectedSensors).map((key) => (
             <label key={key} className="inline-flex items-center mr-4 mt-2">
               <input
                 type="checkbox"
@@ -144,17 +167,29 @@ export default function ElectDashboard() {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="time"
+              type="number"
+              domain={["auto", "auto"]}
+              ticks={generateHalfHourTicks(data)}
               tickFormatter={formatXAxis}
               angle={-45}
               textAnchor="end"
               height={60}
               tick={{ fontSize: 12 }}
             >
-              <Label value={`Time (${tzString})`} position="bottom" offset={0} />
+              <Label
+                value={`Time (${tzString})`}
+                position="bottom"
+                offset={0}
+              />
             </XAxis>
+
             <YAxis />
             <Tooltip
-              labelFormatter={label => new Date(label).toLocaleString(undefined, { timeZoneName: 'short' })}
+              labelFormatter={(label) =>
+                new Date(label).toLocaleString(undefined, {
+                  timeZoneName: "short",
+                })
+              }
             />
             <Legend />
 
