@@ -183,13 +183,13 @@ export default function ElectDashboard() {
             </XAxis>
 
             <YAxis />
-            <Tooltip
+            {/* <Tooltip
               labelFormatter={(label) =>
                 new Date(label).toLocaleString(undefined, {
                   timeZoneName: "short",
                 })
               }
-            />
+            /> */}
             <Legend />
 
             {selectedSensors.temperature && (
