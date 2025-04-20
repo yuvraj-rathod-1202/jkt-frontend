@@ -175,21 +175,21 @@ export default function ElectDashboard() {
               height={60}
               tick={{ fontSize: 11 }}
             >
-              <Label
+              {/* <Label
                 value={`Time (${tzString})`}
                 position="bottom"
                 offset={0}
-              />
+              /> */}
             </XAxis>
 
             <YAxis />
-            {/* <Tooltip
+            <Tooltip
               labelFormatter={(label) =>
                 new Date(label).toLocaleString(undefined, {
                   timeZoneName: "short",
                 })
               }
-            /> */}
+            />
             <Legend />
 
             {selectedSensors.temperature && (
