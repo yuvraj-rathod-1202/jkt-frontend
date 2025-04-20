@@ -105,7 +105,6 @@ export default function ElectDashboard() {
       month: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      timeZoneName: "short",
     });
   };
 
@@ -171,10 +170,10 @@ export default function ElectDashboard() {
               domain={["auto", "auto"]}
               ticks={generateHalfHourTicks(data)}
               tickFormatter={formatXAxis}
-              angle={-45}
+              angle={-60}
               textAnchor="end"
               height={60}
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 11 }}
             >
               <Label
                 value={`Time (${tzString})`}
