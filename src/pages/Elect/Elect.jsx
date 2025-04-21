@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  LineChart,
-  Line,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
   Tooltip,
   Legend,
   CartesianGrid,
   ResponsiveContainer,
-  Label,
 } from "recharts";
 
 export default function ElectDashboard() {
@@ -47,26 +46,6 @@ export default function ElectDashboard() {
     return params.toString();
   };
 
-  // Generate half-hour interval ticks from start to end
-  const generateHalfHourTicks = (data, startDate, endDate) => {
-    if (!data.length) return [];
-  
-    const start = startDate ? new Date(startDate) : new Date(data[0].time);
-    const end = endDate ? new Date(endDate) : new Date(data[data.length - 1].time);
-    const ticks = [];
-  
-    let current = new Date(start);
-    current.setMinutes(Math.floor(current.getMinutes() / 30) * 30, 0, 0); // Round down to nearest half-hour
-  
-    while (current <= end) {
-      ticks.push(current.getTime());
-      current = new Date(current.getTime() + 30 * 60 * 1000); // Add 30 minutes
-    }
-  
-    return ticks;
-  };
-  
-
   // Fetch data whenever filters change
   useEffect(() => {
     const fetchData = async () => {
@@ -99,7 +78,6 @@ export default function ElectDashboard() {
       (!startDate || item.time >= startDate.getTime()) &&
       (!endDate || item.time <= endDate.getTime())
   );
-  
 
   // Handle sensor checkbox toggles
   const toggleSensor = (key) => {
@@ -120,7 +98,7 @@ export default function ElectDashboard() {
   const getYDomain = (filteredData, selectedSensors) => {
     let minY = Infinity;
     let maxY = -Infinity;
-  
+
     filteredData.forEach((item) => {
       Object.keys(selectedSensors).forEach((key) => {
         if (selectedSensors[key] && typeof item[key] === "number") {
@@ -129,16 +107,22 @@ export default function ElectDashboard() {
         }
       });
     });
-  
+
     if (minY === Infinity || maxY === -Infinity) {
       return ["auto", "auto"];
     }
-  
+
     // Optional: Add some padding
     const padding = (maxY - minY) * 0.1;
     return [minY - padding, maxY + padding];
   };
-  
+
+  const sensorColors = {
+    temperature: "#ff7300",
+    humidity: "#387908",
+    moisture: "#8884d8",
+    pollution: "#82ca9d",
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -191,31 +175,32 @@ export default function ElectDashboard() {
       {/* Charts */}
       {!loading && !error && (
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart
+          <ScatterChart
             data={filteredData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="time"
               type="number"
               domain={["auto", "auto"]}
-              ticks={generateHalfHourTicks(data)}
               tickFormatter={formatXAxis}
               angle={-30}
               textAnchor="end"
               height={50}
               tick={{ fontSize: 11 }}
-            >
-              {/* <Label
-                value={`Time (${tzString})`}
-                position="bottom"
-                offset={0}
-              /> */}
-            </XAxis>
-
+              label={{
+                value: `Time (${tzString})`,
+                offset: 0,
+                position: "bottom",
+              }}
+            />
             <YAxis domain={getYDomain(filteredData, selectedSensors)} />
             <Tooltip
+              formatter={(value, name) => [
+                value,
+                name.charAt(0).toUpperCase() + name.slice(1),
+              ]}
               labelFormatter={(label) =>
                 new Date(label).toLocaleString(undefined, {
                   timeZoneName: "short",
@@ -223,48 +208,26 @@ export default function ElectDashboard() {
               }
             />
             <Legend />
-
-            {selectedSensors.temperature && (
-              <Line
-                type="monotone"
-                dataKey="temperature"
-                dot={false}
-                stroke="#ff7300"
-                strokeWidth={2}
-                style={{ marginTop: "20px" }}
-              />
+            {Object.keys(selectedSensors).map((key) =>
+              selectedSensors[key] && (
+                <Scatter
+                  key={key}
+                  name={key.charAt(0).toUpperCase() + key.slice(1)}
+                  data={filteredData.map((item) => ({
+                    time: item.time,
+                    [key]: item[key],
+                  }))}
+                  x="time"
+                  y={key}
+                  fill={sensorColors[key]}
+                  line={{ stroke: sensorColors[key] }}
+                  lineJointType="monotone"
+                  shape="circle"
+                  radius={4}
+                />
+              )
             )}
-            {selectedSensors.humidity && (
-              <Line
-                type="monotone"
-                dataKey="humidity"
-                dot={false}
-                stroke="#387908"
-                strokeWidth={2}
-                style={{ marginTop: "20px" }}
-              />
-            )}
-            {selectedSensors.moisture && (
-              <Line
-                type="monotone"
-                dataKey="moisture"
-                dot={false}
-                stroke="#8884d8"
-                strokeWidth={2}
-                style={{ marginTop: "20px" }}
-              />
-            )}
-            {selectedSensors.pollution && (
-              <Line
-                type="monotone"
-                dataKey="pollution"
-                dot={false}
-                stroke="#82ca9d"
-                strokeWidth={2}
-                style={{ marginTop: "20px" }}
-              />
-            )}
-          </LineChart>
+          </ScatterChart>
         </ResponsiveContainer>
       )}
     </div>
