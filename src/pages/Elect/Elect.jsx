@@ -208,6 +208,7 @@ export default function ElectDashboard() {
                       fill={sensorColors[key]}
                       shape="circle"
                       radius={4}
+                      line={{ stroke: sensorColors[key], strokeWidth: 2 }}
                     />
                   )
               )}
