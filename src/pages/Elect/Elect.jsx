@@ -48,22 +48,24 @@ export default function ElectDashboard() {
   };
 
   // Generate half-hour interval ticks from start to end
-  const generateHalfHourTicks = (data) => {
+  const generateHalfHourTicks = (data, startDate, endDate) => {
     if (!data.length) return [];
-    const start = new Date(data[0].time);
-    const end = new Date(data[data.length - 1].time);
+  
+    const start = startDate ? new Date(startDate) : new Date(data[0].time);
+    const end = endDate ? new Date(endDate) : new Date(data[data.length - 1].time);
     const ticks = [];
-
+  
     let current = new Date(start);
-    current.setMinutes(Math.floor(current.getMinutes() / 30) * 30, 0, 0); // Round to nearest half hour
-
+    current.setMinutes(Math.floor(current.getMinutes() / 30) * 30, 0, 0); // Round down to nearest half-hour
+  
     while (current <= end) {
       ticks.push(current.getTime());
-      current = new Date(current.getTime() + 30 * 60 * 1000); // Add 30 mins
+      current = new Date(current.getTime() + 30 * 60 * 1000); // Add 30 minutes
     }
-
+  
     return ticks;
   };
+  
 
   // Fetch data whenever filters change
   useEffect(() => {
@@ -92,6 +94,13 @@ export default function ElectDashboard() {
     fetchData();
   }, [startDate, endDate]);
 
+  const filteredData = data.filter(
+    (item) =>
+      (!startDate || item.time >= startDate.getTime()) &&
+      (!endDate || item.time <= endDate.getTime())
+  );
+  
+
   // Handle sensor checkbox toggles
   const toggleSensor = (key) => {
     setSelectedSensors((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -107,6 +116,29 @@ export default function ElectDashboard() {
       minute: "2-digit",
     });
   };
+
+  const getYDomain = (filteredData, selectedSensors) => {
+    let minY = Infinity;
+    let maxY = -Infinity;
+  
+    filteredData.forEach((item) => {
+      Object.keys(selectedSensors).forEach((key) => {
+        if (selectedSensors[key] && typeof item[key] === "number") {
+          minY = Math.min(minY, item[key]);
+          maxY = Math.max(maxY, item[key]);
+        }
+      });
+    });
+  
+    if (minY === Infinity || maxY === -Infinity) {
+      return ["auto", "auto"];
+    }
+  
+    // Optional: Add some padding
+    const padding = (maxY - minY) * 0.1;
+    return [minY - padding, maxY + padding];
+  };
+  
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -160,7 +192,7 @@ export default function ElectDashboard() {
       {!loading && !error && (
         <ResponsiveContainer width="100%" height={400}>
           <LineChart
-            data={data}
+            data={filteredData}
             margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -182,7 +214,7 @@ export default function ElectDashboard() {
               /> */}
             </XAxis>
 
-            <YAxis />
+            <YAxis domain={getYDomain(filteredData, selectedSensors)} />
             <Tooltip
               labelFormatter={(label) =>
                 new Date(label).toLocaleString(undefined, {
