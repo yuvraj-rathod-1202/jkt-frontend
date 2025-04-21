@@ -222,7 +222,7 @@ export default function ElectDashboard() {
                   fill={sensorColors[key]}
                   line={{ stroke: sensorColors[key] }}
                   lineJointType="monotone"
-                  shape="circle"
+                  shape="circle" // Added the shape property here!
                   radius={4}
                 />
               )
