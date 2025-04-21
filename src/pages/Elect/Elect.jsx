@@ -38,7 +38,7 @@ export default function ElectDashboard() {
   const tzMins = String(Math.abs(tzOffsetMinutes) % 60).padStart(2, "0");
   const tzString = `UTC${tzSign}${tzHours}:${tzMins}`;
 
-  // Build query params from filters
+  // Build query params
   const buildQuery = () => {
     const params = new URLSearchParams();
     if (startDate) params.append("start", startDate.toISOString());
@@ -46,20 +46,21 @@ export default function ElectDashboard() {
     return params.toString();
   };
 
-  // Fetch data whenever filters change
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
         const query = buildQuery();
-        const url = `https://jkt-backend.vercel.app/api/elect/${query ? `?${query}` : ""}`;
+        const url = `https://jkt-backend.vercel.app/api/elect${query ? `?${query}` : ''}`;
+        console.log('Fetching:', url);
         const resp = await fetch(url);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
         const chartData = json.map((item) => ({
           time: new Date(item.time).getTime(),
-          temperature: parseFloat(item.temperature),  // <-- fixed typo here
+          temperature: parseFloat(item.temperature),
           humidity: parseFloat(item.humidity),
           moisture: parseFloat(item.moisture),
           pollution: parseFloat(item.pollution),
@@ -74,18 +75,20 @@ export default function ElectDashboard() {
     fetchData();
   }, [startDate, endDate]);
 
-  // Filter data by date
-  const filteredData = data.filter(
-    (item) =>
-      (!startDate || item.time >= startDate.getTime()) &&
-      (!endDate || item.time <= endDate.getTime())
-  );
+  // Filter and sort data
+  const filteredData = data
+    .filter(
+      (item) =>
+        (!startDate || item.time >= startDate.getTime()) &&
+        (!endDate || item.time <= endDate.getTime())
+    )
+    .sort((a, b) => a.time - b.time);
 
-  // Toggle sensor visibility
+  // Toggle sensor
   const toggleSensor = (key) =>
     setSelectedSensors((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // Format X-axis labels
+  // X-axis formatter
   const formatXAxis = (tick) =>
     new Date(tick).toLocaleString(undefined, {
       day: "2-digit",
@@ -94,33 +97,32 @@ export default function ElectDashboard() {
       minute: "2-digit",
     });
 
-  // Generate half‑hour ticks between min and max time
-  const generateHalfHourTicks = (data) => {
-    if (!data.length) return [];
-    const start = new Date(data[0].time);
-    const end = new Date(data[data.length - 1].time);
-    let current = new Date(start);
-    current.setMinutes(Math.floor(current.getMinutes() / 30) * 30, 0, 0);
+  // Generate half-hour ticks
+  const generateHalfHourTicks = (arr) => {
+    if (!arr.length) return [];
+    const min = arr[0].time;
+    const max = arr[arr.length - 1].time;
     const ticks = [];
-    while (current <= end) {
-      ticks.push(current.getTime());
-      current = new Date(current.getTime() + 30 * 60 * 1000);
+    let cur = new Date(min);
+    cur.setMinutes(Math.floor(cur.getMinutes() / 30) * 30, 0, 0);
+    while (cur.getTime() <= max) {
+      ticks.push(cur.getTime());
+      cur = new Date(cur.getTime() + 30 * 60 * 1000);
     }
     return ticks;
   };
 
-  // Compute X-domain from filtered data
-  const getXDomain = (data) => {
-    if (!data.length) return ["auto", "auto"];
-    const times = data.map((d) => d.time);
-    return [Math.min(...times), Math.max(...times)];
-  };
+  // Get X domain
+  const getXDomain = (arr) =>
+    arr.length
+      ? [arr[0].time, arr[arr.length - 1].time]
+      : ["auto", "auto"];
 
-  // Compute Y-domain from filtered data & visible sensors
-  const getYDomain = (data, sensors) => {
+  // Get Y domain
+  const getYDomain = (arr, sensors) => {
     let minY = Infinity,
       maxY = -Infinity;
-    data.forEach((item) =>
+    arr.forEach((item) =>
       Object.keys(sensors).forEach((key) => {
         if (sensors[key] && typeof item[key] === "number") {
           minY = Math.min(minY, item[key]);
@@ -128,9 +130,7 @@ export default function ElectDashboard() {
         }
       })
     );
-    if (minY === Infinity || maxY === -Infinity) {
-      return ["auto", "auto"];
-    }
+    if (minY === Infinity) return ["auto", "auto"];
     const pad = (maxY - minY) * 0.1;
     return [minY - pad, maxY + pad];
   };
@@ -145,9 +145,7 @@ export default function ElectDashboard() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-1">Environmental Dashboard</h1>
-      <p className="text-sm text-gray-500 mb-4">
-        All times shown in {tzString}
-      </p>
+      <p className="text-sm text-gray-500 mb-4">All times shown in {tzString}</p>
 
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -193,15 +191,12 @@ export default function ElectDashboard() {
       {/* Scatter Chart */}
       {!loading && !error && (
         <ResponsiveContainer width="100%" height={400}>
-          <ScatterChart
-            data={filteredData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-          >
+          <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" />
 
             <XAxis
-              dataKey="time"
               type="number"
+              dataKey="time"
               domain={getXDomain(filteredData)}
               ticks={generateHalfHourTicks(filteredData)}
               tickFormatter={formatXAxis}
@@ -209,11 +204,7 @@ export default function ElectDashboard() {
               textAnchor="end"
               height={50}
               tick={{ fontSize: 11 }}
-              label={{
-                value: `Time (${tzString})`,
-                position: "bottom",
-                offset: 0,
-              }}
+              label={{ value: `Time (${tzString})`, position: "bottom", offset: 0 }}
             />
 
             <YAxis domain={getYDomain(filteredData, selectedSensors)} />
@@ -224,9 +215,7 @@ export default function ElectDashboard() {
                 name.charAt(0).toUpperCase() + name.slice(1),
               ]}
               labelFormatter={(label) =>
-                new Date(label).toLocaleString(undefined, {
-                  timeZoneName: "short",
-                })
+                new Date(label).toLocaleString(undefined, { timeZoneName: "short" })
               }
             />
 
@@ -238,10 +227,7 @@ export default function ElectDashboard() {
                   <Scatter
                     key={key}
                     name={key.charAt(0).toUpperCase() + key.slice(1)}
-                    data={filteredData.map((item) => ({
-                      time: item.time,
-                      [key]: item[key],
-                    }))}
+                    data={filteredData.map((item) => ({ time: item.time, [key]: item[key] }))}
                     x="time"
                     y={key}
                     fill={sensorColors[key]}
