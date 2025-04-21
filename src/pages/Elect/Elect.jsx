@@ -53,12 +53,13 @@ export default function ElectDashboard() {
       setError(null);
       try {
         const query = buildQuery();
-        const resp = await fetch(`https://jkt-backend.vercel.app/api/elect/`);
+        const url = `https://jkt-backend.vercel.app/api/elect/${query ? `?${query}` : ""}`;
+        const resp = await fetch(url);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
         const chartData = json.map((item) => ({
           time: new Date(item.time).getTime(),
-          temperature: parseFloat(item.tempreature),
+          temperature: parseFloat(item.temperature),  // <-- fixed typo here
           humidity: parseFloat(item.humidity),
           moisture: parseFloat(item.moisture),
           pollution: parseFloat(item.pollution),
@@ -73,48 +74,65 @@ export default function ElectDashboard() {
     fetchData();
   }, [startDate, endDate]);
 
+  // Filter data by date
   const filteredData = data.filter(
     (item) =>
       (!startDate || item.time >= startDate.getTime()) &&
       (!endDate || item.time <= endDate.getTime())
   );
 
-  // Handle sensor checkbox toggles
-  const toggleSensor = (key) => {
+  // Toggle sensor visibility
+  const toggleSensor = (key) =>
     setSelectedSensors((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
 
-  // Format X-axis ticks with local timezone
-  const formatXAxis = (tick) => {
-    const date = new Date(tick);
-    return date.toLocaleString(undefined, {
+  // Format X-axis labels
+  const formatXAxis = (tick) =>
+    new Date(tick).toLocaleString(undefined, {
       day: "2-digit",
       month: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
     });
+
+  // Generate half‑hour ticks between min and max time
+  const generateHalfHourTicks = (data) => {
+    if (!data.length) return [];
+    const start = new Date(data[0].time);
+    const end = new Date(data[data.length - 1].time);
+    let current = new Date(start);
+    current.setMinutes(Math.floor(current.getMinutes() / 30) * 30, 0, 0);
+    const ticks = [];
+    while (current <= end) {
+      ticks.push(current.getTime());
+      current = new Date(current.getTime() + 30 * 60 * 1000);
+    }
+    return ticks;
   };
 
-  const getYDomain = (filteredData, selectedSensors) => {
-    let minY = Infinity;
-    let maxY = -Infinity;
+  // Compute X-domain from filtered data
+  const getXDomain = (data) => {
+    if (!data.length) return ["auto", "auto"];
+    const times = data.map((d) => d.time);
+    return [Math.min(...times), Math.max(...times)];
+  };
 
-    filteredData.forEach((item) => {
-      Object.keys(selectedSensors).forEach((key) => {
-        if (selectedSensors[key] && typeof item[key] === "number") {
+  // Compute Y-domain from filtered data & visible sensors
+  const getYDomain = (data, sensors) => {
+    let minY = Infinity,
+      maxY = -Infinity;
+    data.forEach((item) =>
+      Object.keys(sensors).forEach((key) => {
+        if (sensors[key] && typeof item[key] === "number") {
           minY = Math.min(minY, item[key]);
           maxY = Math.max(maxY, item[key]);
         }
-      });
-    });
-
+      })
+    );
     if (minY === Infinity || maxY === -Infinity) {
       return ["auto", "auto"];
     }
-
-    // Optional: Add some padding
-    const padding = (maxY - minY) * 0.1;
-    return [minY - padding, maxY + padding];
+    const pad = (maxY - minY) * 0.1;
+    return [minY - pad, maxY + pad];
   };
 
   const sensorColors = {
@@ -131,13 +149,13 @@ export default function ElectDashboard() {
         All times shown in {tzString}
       </p>
 
-      {/* Filter Panel */}
+      {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium">Start Date</label>
           <DatePicker
             selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            onChange={setStartDate}
             showTimeSelect
             dateFormat="yyyy-MM-dd HH:mm"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -147,15 +165,15 @@ export default function ElectDashboard() {
           <label className="block text-sm font-medium">End Date</label>
           <DatePicker
             selected={endDate}
-            onChange={(date) => setEndDate(date)}
+            onChange={setEndDate}
             showTimeSelect
             dateFormat="yyyy-MM-dd HH:mm"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
         </div>
-        <div className="col-span-2 flex items-center space-x-4 flex-wrap">
+        <div className="col-span-2 flex items-center flex-wrap space-x-4">
           {Object.keys(selectedSensors).map((key) => (
-            <label key={key} className="inline-flex items-center mr-4 mt-2">
+            <label key={key} className="inline-flex items-center mt-2">
               <input
                 type="checkbox"
                 checked={selectedSensors[key]}
@@ -169,10 +187,10 @@ export default function ElectDashboard() {
       </div>
 
       {/* Loading / Error */}
-      {loading && <p>Loading data...</p>}
+      {loading && <p>Loading data…</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
 
-      {/* Charts */}
+      {/* Scatter Chart */}
       {!loading && !error && (
         <ResponsiveContainer width="100%" height={400}>
           <ScatterChart
@@ -180,10 +198,12 @@ export default function ElectDashboard() {
             margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
+
             <XAxis
               dataKey="time"
               type="number"
-              domain={["auto", "auto"]}
+              domain={getXDomain(filteredData)}
+              ticks={generateHalfHourTicks(filteredData)}
               tickFormatter={formatXAxis}
               angle={-30}
               textAnchor="end"
@@ -191,11 +211,13 @@ export default function ElectDashboard() {
               tick={{ fontSize: 11 }}
               label={{
                 value: `Time (${tzString})`,
-                offset: 0,
                 position: "bottom",
+                offset: 0,
               }}
             />
+
             <YAxis domain={getYDomain(filteredData, selectedSensors)} />
+
             <Tooltip
               formatter={(value, name) => [
                 value,
@@ -207,25 +229,28 @@ export default function ElectDashboard() {
                 })
               }
             />
+
             <Legend />
-            {Object.keys(selectedSensors).map((key) =>
-              selectedSensors[key] && (
-                <Scatter
-                  key={key}
-                  name={key.charAt(0).toUpperCase() + key.slice(1)}
-                  data={filteredData.map((item) => ({
-                    time: item.time,
-                    [key]: item[key],
-                  }))}
-                  x="time"
-                  y={key}
-                  fill={sensorColors[key]}
-                  line={{ stroke: sensorColors[key] }}
-                  lineJointType="monotone"
-                  shape="circle" // Added the shape property here!
-                  radius={4}
-                />
-              )
+
+            {Object.keys(selectedSensors).map(
+              (key) =>
+                selectedSensors[key] && (
+                  <Scatter
+                    key={key}
+                    name={key.charAt(0).toUpperCase() + key.slice(1)}
+                    data={filteredData.map((item) => ({
+                      time: item.time,
+                      [key]: item[key],
+                    }))}
+                    x="time"
+                    y={key}
+                    fill={sensorColors[key]}
+                    line={{ stroke: sensorColors[key] }}
+                    lineJointType="monotone"
+                    shape="circle"
+                    radius={4}
+                  />
+                )
             )}
           </ScatterChart>
         </ResponsiveContainer>
