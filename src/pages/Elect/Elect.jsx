@@ -13,7 +13,6 @@ import {
 } from "recharts";
 
 export default function ElectDashboard() {
-  // Filter states
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [selectedSensors, setSelectedSensors] = useState({
@@ -23,22 +22,16 @@ export default function ElectDashboard() {
     pollution: true,
   });
 
-  // Data state
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Compute user's timezone offset string
   const tzOffsetMinutes = -new Date().getTimezoneOffset();
   const tzSign = tzOffsetMinutes >= 0 ? "+" : "-";
-  const tzHours = String(Math.floor(Math.abs(tzOffsetMinutes) / 60)).padStart(
-    2,
-    "0"
-  );
+  const tzHours = String(Math.floor(Math.abs(tzOffsetMinutes) / 60)).padStart(2, "0");
   const tzMins = String(Math.abs(tzOffsetMinutes) % 60).padStart(2, "0");
   const tzString = `UTC${tzSign}${tzHours}:${tzMins}`;
 
-  // Build query params
   const buildQuery = () => {
     const params = new URLSearchParams();
     if (startDate) params.append("start", startDate.toISOString());
@@ -46,26 +39,26 @@ export default function ElectDashboard() {
     return params.toString();
   };
 
-  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
         const query = buildQuery();
-        const url = `https://jkt-backend.vercel.app/api/elect${query ? `?${query}` : ''}`;
-        console.log('Fetching:', url);
+        const baseUrl = "https://jkt-backend.vercel.app/api/elect/";
+        const url = query ? `${baseUrl}?${query}` : baseUrl;
+        console.log("Fetching data:", url);
         const resp = await fetch(url);
         if (!resp.ok) throw new Error(`Error ${resp.status}`);
         const json = await resp.json();
         const chartData = json.map((item) => ({
           time: new Date(item.time).getTime(),
-          temperature: parseFloat(item.temperature),
+          temperature: parseFloat(item.tempreature ?? item.temperature),
           humidity: parseFloat(item.humidity),
           moisture: parseFloat(item.moisture),
           pollution: parseFloat(item.pollution),
         }));
-        setData(chartData);
+        setData(chartData.sort((a, b) => a.time - b.time));
       } catch (err) {
         setError(err.message);
       } finally {
@@ -75,20 +68,15 @@ export default function ElectDashboard() {
     fetchData();
   }, [startDate, endDate]);
 
-  // Filter and sort data
-  const filteredData = data
-    .filter(
-      (item) =>
-        (!startDate || item.time >= startDate.getTime()) &&
-        (!endDate || item.time <= endDate.getTime())
-    )
-    .sort((a, b) => a.time - b.time);
+  const filteredData = data.filter(
+    (item) =>
+      (!startDate || item.time >= startDate.getTime()) &&
+      (!endDate || item.time <= endDate.getTime())
+  );
 
-  // Toggle sensor
   const toggleSensor = (key) =>
     setSelectedSensors((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // X-axis formatter
   const formatXAxis = (tick) =>
     new Date(tick).toLocaleString(undefined, {
       day: "2-digit",
@@ -97,34 +85,15 @@ export default function ElectDashboard() {
       minute: "2-digit",
     });
 
-  // Generate half-hour ticks
-  const generateHalfHourTicks = (arr) => {
-    if (!arr.length) return [];
-    const min = arr[0].time;
-    const max = arr[arr.length - 1].time;
-    const ticks = [];
-    let cur = new Date(min);
-    cur.setMinutes(Math.floor(cur.getMinutes() / 30) * 30, 0, 0);
-    while (cur.getTime() <= max) {
-      ticks.push(cur.getTime());
-      cur = new Date(cur.getTime() + 30 * 60 * 1000);
-    }
-    return ticks;
-  };
-
-  // Get X domain
   const getXDomain = (arr) =>
-    arr.length
-      ? [arr[0].time, arr[arr.length - 1].time]
-      : ["auto", "auto"];
+    arr.length ? [Math.min(...arr.map((d) => d.time)), Math.max(...arr.map((d) => d.time))] : ["auto", "auto"];
 
-  // Get Y domain
   const getYDomain = (arr, sensors) => {
     let minY = Infinity,
       maxY = -Infinity;
     arr.forEach((item) =>
       Object.keys(sensors).forEach((key) => {
-        if (sensors[key] && typeof item[key] === "number") {
+        if (sensors[key] && typeof item[key] === "number" && !isNaN(item[key])) {
           minY = Math.min(minY, item[key]);
           maxY = Math.max(maxY, item[key]);
         }
@@ -147,7 +116,6 @@ export default function ElectDashboard() {
       <h1 className="text-2xl font-bold mb-1">Environmental Dashboard</h1>
       <p className="text-sm text-gray-500 mb-4">All times shown in {tzString}</p>
 
-      {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium">Start Date</label>
@@ -184,62 +152,68 @@ export default function ElectDashboard() {
         </div>
       </div>
 
-      {/* Loading / Error */}
       {loading && <p>Loading data…</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
 
-      {/* Scatter Chart */}
       {!loading && !error && (
-        <ResponsiveContainer width="100%" height={400}>
-          <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-            <CartesianGrid strokeDasharray="3 3" />
+        <>
+          <p className="mb-2 text-sm text-gray-600">Points: {filteredData.length}</p>
+          <ResponsiveContainer width="100%" height={400}>
+            <ScatterChart
+              data={filteredData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
 
-            <XAxis
-              type="number"
-              dataKey="time"
-              domain={getXDomain(filteredData)}
-              ticks={generateHalfHourTicks(filteredData)}
-              tickFormatter={formatXAxis}
-              angle={-30}
-              textAnchor="end"
-              height={50}
-              tick={{ fontSize: 11 }}
-              label={{ value: `Time (${tzString})`, position: "bottom", offset: 0 }}
-            />
+              <XAxis
+                dataKey="time"
+                type="number"
+                domain={getXDomain(filteredData)}
+                ticks={
+                  filteredData.length
+                    ? Array.from({ length: Math.ceil((getXDomain(filteredData)[1] - getXDomain(filteredData)[0]) / (30 * 60 * 1000)) + 1 }, (_, i) =>
+                        getXDomain(filteredData)[0] + i * 30 * 60 * 1000
+                      )
+                    : []
+                }
+                tickFormatter={formatXAxis}
+                angle={-30}
+                textAnchor="end"
+                height={50}
+                tick={{ fontSize: 11 }}
+                label={{ value: `Time (${tzString})`, position: "bottom", offset: 0 }}
+              />
 
-            <YAxis domain={getYDomain(filteredData, selectedSensors)} />
+              <YAxis domain={getYDomain(filteredData, selectedSensors)} />
 
-            <Tooltip
-              formatter={(value, name) => [
-                value,
-                name.charAt(0).toUpperCase() + name.slice(1),
-              ]}
-              labelFormatter={(label) =>
-                new Date(label).toLocaleString(undefined, { timeZoneName: "short" })
-              }
-            />
+              <Tooltip
+                formatter={(value, name) => [
+                  value,
+                  name.charAt(0).toUpperCase() + name.slice(1),
+                ]}
+                labelFormatter={(label) =>
+                  new Date(label).toLocaleString(undefined, { timeZoneName: "short" })
+                }
+              />
 
-            <Legend />
+              <Legend />
 
-            {Object.keys(selectedSensors).map(
-              (key) =>
-                selectedSensors[key] && (
-                  <Scatter
-                    key={key}
-                    name={key.charAt(0).toUpperCase() + key.slice(1)}
-                    data={filteredData.map((item) => ({ time: item.time, [key]: item[key] }))}
-                    x="time"
-                    y={key}
-                    fill={sensorColors[key]}
-                    line={{ stroke: sensorColors[key] }}
-                    lineJointType="monotone"
-                    shape="circle"
-                    radius={4}
-                  />
-                )
-            )}
-          </ScatterChart>
-        </ResponsiveContainer>
+              {Object.keys(selectedSensors).map(
+                (key) =>
+                  selectedSensors[key] && (
+                    <Scatter
+                      key={key}
+                      name={key.charAt(0).toUpperCase() + key.slice(1)}
+                      dataKey={key}
+                      fill={sensorColors[key]}
+                      shape="circle"
+                      radius={4}
+                    />
+                  )
+              )}
+            </ScatterChart>
+          </ResponsiveContainer>
+        </>
       )}
     </div>
   );
